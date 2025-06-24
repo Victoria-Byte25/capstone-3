@@ -21,9 +21,9 @@ public class ProfileController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Profile> getProfile(Authentication auth) {
-        String username = auth.getName();
-        System.out.println("/profile endpoint was hit with user: " + username);
-        Profile profile = profileDao.findByUsername(username);
+        String email = auth.getName();
+        System.out.println("/profile endpoint was hit with user: " + email);
+        Profile profile = profileDao.findByUsername(email);
 
         if (profile == null) {
             return ResponseEntity.notFound().build();

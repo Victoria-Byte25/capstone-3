@@ -85,33 +85,17 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
         return products;
     }
 
-    @Override
-    public List<Product> listByCategoryId(int categoryId)
-    {
-        List<Product> products = new ArrayList<>();
 
-        String sql = "SELECT * FROM products WHERE category_id = ?";
+    private PreparedStatement prepareStatement(Connection conn, String sql, List<Object> params) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement(sql);
 
-        try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql))
-        {
-            statement.setInt(1, categoryId);
-
-            ResultSet row = statement.executeQuery();
-
-            while (row.next())
-            {
-                Product product = mapRow(row);
-                products.add(product);
-            }
-        }
-        catch (SQLException e)
-        {
-            throw new RuntimeException(e);
+        for (int i = 0; i < params.size(); i++) {
+            stmt.setObject(i + 1, params.get(i));
         }
 
-        return products;
+        return stmt;
     }
+
 
     @Override
     public Product getById(int productId)
@@ -240,4 +224,29 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao
 
         return new Product(productId, name, price, categoryId, description, color, stock, isFeatured, imageUrl);
     }
+
+    @Override
+    public List<Product> listByCategoryId(int categoryId) {
+        List<Product> products = new ArrayList<>();
+
+        String sql = "SELECT * FROM products WHERE category_id = ?";
+        try (
+                Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)
+        ) {
+            stmt.setInt(1, categoryId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = mapRow(rs);
+                products.add(product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error searching by category ID", e);
+        }
+
+        return products;
+    }
+
 }

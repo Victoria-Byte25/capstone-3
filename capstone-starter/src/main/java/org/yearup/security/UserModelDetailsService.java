@@ -1,6 +1,7 @@
 package org.yearup.security;
 
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.yearup.data.UserDao;
 import org.yearup.models.User;
 import org.slf4j.Logger;
@@ -36,8 +37,12 @@ public class UserModelDetailsService implements UserDetailsService {
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
+        if (user == null) {
+            throw new UsernameNotFoundException("User " + lowercaseLogin + " was not activated");
+        }
+
         if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+            throw new UserNotActivatedException("User '" + lowercaseLogin + "' was not activated");
         }
         List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getName()))

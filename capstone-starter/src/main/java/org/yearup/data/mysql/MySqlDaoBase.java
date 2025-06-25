@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 public abstract class MySqlDaoBase
 {
     protected JdbcTemplate jdbcTemplate;
-    private DataSource dataSource;
+    protected DataSource dataSource;
 
     public MySqlDaoBase(DataSource dataSource)
     {

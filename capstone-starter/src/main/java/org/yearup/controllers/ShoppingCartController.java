@@ -79,4 +79,28 @@ public class ShoppingCartController
         }
     }
 
+    @PutMapping("/products/{productId}")
+    public void updateQuantity(@PathVariable int productId, @RequestParam String action, Principal principal) {
+        try {
+            String userName = principal.getName();
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            int change = 0;
+            if (action.equalsIgnoreCase("increase")) {
+                change = 1;
+            } else if (action.equalsIgnoreCase("decrease")) {
+                change = -1;
+            } else {
+                throw new IllegalArgumentException("Action must be 'increase' or 'decrease'");
+            }
+
+            shoppingCartDao.updateQuantity(userId, productId, change);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update cart item.");
+        }
+    }
+
 }

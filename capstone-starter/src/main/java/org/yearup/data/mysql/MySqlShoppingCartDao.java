@@ -57,10 +57,13 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     }
 
     @Override
-    public void updateQuantity(int userId, int productId, int quantity)
-    {
-        String sql = "UPDATE shopping_cart SET quantity = ? WHERE user_id = ? AND product_id = ?";
-        jdbcTemplate.update(sql, quantity, userId, productId);
+    public void updateQuantity(int userId, int productId, int change) {
+        String sql = "UPDATE cart_item " +
+                "SET quantity = GREATEST(quantity + ?, 0) " +
+                "WHERE user_id = ? AND product_id = ?";
+        jdbcTemplate.update(sql, change, userId, productId);
+
+        String deleteSql = "delete from cart_item where user_id = ? and product_id = ? and quantity = 0";
     }
 
     @Override

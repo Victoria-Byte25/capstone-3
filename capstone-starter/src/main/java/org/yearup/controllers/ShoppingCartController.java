@@ -43,6 +43,10 @@ public class ShoppingCartController
             ShoppingCart cart = new ShoppingCart();
             for (ShoppingCartItem item : cartItems)
             {
+                int quantity = item.getQuantity();
+                if (quantity <= 0) {
+                    continue;
+                }
                 int productId = item.getProduct().getProductId();
                 cart.getItems().put(productId, item);
             }
@@ -100,6 +104,20 @@ public class ShoppingCartController
         } catch (Exception e) {
             e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update cart item.");
+        }
+    }
+
+    @DeleteMapping
+    public void clearCart(Principal principal) {
+        try {
+            String userName = principal.getName();
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            shoppingCartDao.clearCart(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to clear cart.");
         }
     }
 

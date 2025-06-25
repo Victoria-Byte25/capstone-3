@@ -6,14 +6,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 import java.util.List;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 public abstract class MySqlDaoBase
 {
+    protected JdbcTemplate jdbcTemplate;
     private DataSource dataSource;
 
     public MySqlDaoBase(DataSource dataSource)
     {
         this.dataSource = dataSource;
+        this.jdbcTemplate =new JdbcTemplate(dataSource);
     }
 
     protected Connection getConnection() throws SQLException

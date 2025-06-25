@@ -20,34 +20,47 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
     @Override
     public List<Category> getAllCategories()
     {
-        // get all categories
-        return null;
+        String sql = "SELECT * FROM categories";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRow(rs));
     }
 
     @Override
     public Category getById(int categoryId)
     {
-        // get category by id
-        return null;
+        String sql = "SELECT * FROM categories WHERE category_id = ?";
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapRow(rs), categoryId);
     }
 
     @Override
     public Category create(Category category)
     {
-        // create a new category
+        String sql = """
+                INSERT INTO categories (name, description)
+                VALUES (?, ?)
+                """;
+
+        jdbcTemplate.update(sql, category.getName(), category.getDescription());
+
         return null;
     }
 
     @Override
     public void update(int categoryId, Category category)
     {
-        // update category
+        String sql = """
+                UPDATE categories
+                SET name = ?, description = ?
+                WHERE category_id = ?
+                """;
+
+        jdbcTemplate.update(sql, category.getName(), category.getDescription(), categoryId);
     }
 
     @Override
     public void delete(int categoryId)
     {
-        // delete category
+        String sql = "DELETE FROM categories WHERE category_id = ?";
+        jdbcTemplate.update(sql, categoryId);
     }
 
     private Category mapRow(ResultSet row) throws SQLException
@@ -65,5 +78,4 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao
 
         return category;
     }
-
 }

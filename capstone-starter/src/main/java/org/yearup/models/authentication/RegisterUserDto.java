@@ -42,6 +42,7 @@ public class RegisterUserDto {
         this.confirmPassword = confirmPassword;
     }
 
+
     public String getRole() {
         return role;
     }

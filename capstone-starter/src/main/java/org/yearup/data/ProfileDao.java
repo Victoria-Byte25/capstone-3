@@ -7,4 +7,5 @@ public interface ProfileDao
 {
     Profile findByUsername(String username);
     Profile create(Profile profile);
+    void update(Profile profile);
 }

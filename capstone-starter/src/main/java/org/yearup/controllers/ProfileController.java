@@ -18,21 +18,51 @@ public class ProfileController {
         this.profileDao = profileDao;
     }
 
-    @GetMapping
+    @PutMapping("/update")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Profile> updateProfile(@RequestBody Profile updatedProfile, Authentication auth) {
+        String email = auth.getName();
+        System.out.println("/profile PUT endpoint was hit with user: " + email);
+
+        Profile existingProfile = profileDao.findByUsername(email);
+
+        if (existingProfile== null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        existingProfile.setFirstName(updatedProfile.getFirstName());
+        existingProfile.setLastName(updatedProfile.getLastName());
+        existingProfile.setPhone(updatedProfile.getPhone());
+        existingProfile.setAddress(updatedProfile.getAddress());
+        if (updatedProfile.getCity() != null && !updatedProfile.getCity().isBlank()) {
+            existingProfile.setCity(updatedProfile.getCity());
+        }
+        if (updatedProfile.getState() != null && !updatedProfile.getState().isBlank()){
+            existingProfile.setState(updatedProfile.getState());
+        }
+        if (updatedProfile.getZip() != null && !updatedProfile.getZip().isBlank()) {
+            existingProfile.setZip(updatedProfile.getZip());
+        }
+
+        profileDao.update(existingProfile);
+
+
+        return ResponseEntity.ok(existingProfile);
+    }
+    @GetMapping("/test")
+    public  String testProfileController() {
+        return "Profile controller is working";
+    }
+
+    @GetMapping("/get")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<Profile> getProfile(Authentication auth) {
         String email = auth.getName();
-        System.out.println("/profile endpoint was hit with user: " + email);
         Profile profile = profileDao.findByUsername(email);
 
         if (profile == null) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(profile);
-    }
-    @GetMapping("/test")
-    public  String testProfileController() {
-        return "Profile controller is working";
+        return  ResponseEntity.ok(profile);
     }
 }

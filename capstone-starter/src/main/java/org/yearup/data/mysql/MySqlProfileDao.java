@@ -68,11 +68,33 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
                 profile.setZip(rs.getString("zip"));
                 return profile;
             }
+
             return null;
         }
         catch (SQLException e)
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void update(Profile profile)
+    {
+        String sql = """
+                UPDATE profiles
+                SET first_name = ?, last_name = ?, phone = ?, address = ?, city = ?, state = ?, zip = ?
+                WHERE email = ?
+                """;
+
+        jdbcTemplate.update(sql,
+                profile.getFirstName(),
+                profile.getLastName(),
+                profile.getPhone(),
+                profile.getAddress(),
+                profile.getCity(),
+                profile.getState(),
+                profile.getZip(),
+                profile.getEmail()
+        );
     }
 }

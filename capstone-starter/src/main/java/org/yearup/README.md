@@ -11,11 +11,9 @@ Features
 7.Shopping cart logic (in progress)
 8.Clean layered structure using DAO + Controller
 
-What I'm Proud Of
+Code I'm Proud Of
 Product Filtering (Search)
 .I implemented a dynamic search endpoint that lets users filter products by name or category using Java Streams.
-.I implemented custom quantity controls using endpoints, allowing users to increase or decrease the quantity of item in their cart.
-
 
 Controller:
 @GetMapping("/search")
@@ -38,3 +36,34 @@ This update shows:
 .Real-world application: Users need to search and find products easily
 .My understanding of how to connect controller and DAO layers
 
+.I implemented custom quantity controls using endpoints, allowing users to increase or decrease the quantity of item in their cart.
+
+@PutMapping("/products/{productId}")
+public void updateQuantity(@PathVariable int productId, @RequestParam String action, Principal principal) {
+try {
+String userName = principal.getName();
+User user = userDao.getByUserName(userName);
+int userId = user.getId();
+
+int change = 0;
+        if (action.equalsIgnoreCase("increase")) {
+            change = 1;
+        } else if (action.equalsIgnoreCase("decrease")) {
+            change = -1;
+        } else {
+            throw new IllegalArgumentException("Action must be 'increase' or 'decrease'");
+        }
+
+shoppingCartDao.updateQuantity(userId, productId, change);
+    } catch (Exception e) {
+        e.printStackTrace();
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to update cart item.");
+    }
+}
+
+Why this is Better
+.It works off a single endpoint, making the code DRY and clean.
+.It uses query parameters instead of separate URLs like /increase and /decrease.
+.It includes exception handling and checks for valid input (increase or decrease only).
+.wrote logic to determine whether to +1 or -1 the quantity, which is cleaner and less repetitive than multiple routes.
+.It uses the currently logged-in user (principal) — super smart and secure.
